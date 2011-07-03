@@ -2,11 +2,13 @@ class Data {
   float[] pitch;
   float[] rms;
   float[] time;
+  int[] onsets;
 
   Data() {
     pitch = new float[0];
     rms = new float[0];
     time = new float[0];
+    onsets = new int[0]; 
   }
 
   void runVamp(String pathToAudioFile) {

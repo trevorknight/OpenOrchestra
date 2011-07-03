@@ -34,7 +34,11 @@ void setup() {
   filterPitch(reference);
   filterPitch(student);
   
+  findOnsets(reference);
+  findOnsets(student);
+  
 }
+
 
 
 
