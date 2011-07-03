@@ -31,6 +31,9 @@ void setup() {
     student.saveData("student.dat");
   }
   
+  filterPitch(reference);
+  filterPitch(student);
+  
 }
 
 
