@@ -8,11 +8,8 @@ String refAudioFileName;
 String pathToStuAudioFile;
 String stuAudioFileName;
 
-float[] time;
-float[] refPitch;
-float[] stuPitch;
-float[] refRMS;
-float[] stuRMS;
+Data reference;
+Data student;
 
 
 void setup() {
@@ -21,15 +18,21 @@ void setup() {
   stuAudioFileName = "SA-XB-03-002.wav";
   pathToStuAudioFile = dataPath(stuAudioFileName);
   
-  try {
-    loadData("reference.dat", time, refPitch, refRMS);
-    loadData("student.dat", time, stuPitch, stuRMS);
-  } catch (Exception e) {
-    runVamp(pathToRefAudioFile, refPitch, refRMS);
-    runVamp(pathToStuAudioFile, stuPitch, stuRMS);
-  }  
+  reference = new Data();
+  student = new Data();
 
+  try {
+    reference.loadData("reference.dat");
+    student.loadData("student.dat");
+  } catch (Exception e) {
+    reference.runVamp(pathToRefAudioFile);
+    reference.saveData("reference.dat");
+    student.runVamp(pathToStuAudioFile);
+    student.saveData("student.dat");
+  }
   
 }
+
+
 
 
