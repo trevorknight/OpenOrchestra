@@ -1,14 +1,20 @@
+// Class for holding extracted data from recordings
+
 class Data {
   float[] pitch;
   float[] rms;
   float[] time;
   int[] onsets;
+  Note[] notes;
+  color noteColor;
 
-  Data() {
+  Data(color _noteColor) {
+    noteColor = _noteColor;
     pitch = new float[0];
     rms = new float[0];
     time = new float[0];
-    onsets = new int[0]; 
+    onsets = new int[0];
+    notes = new Note[0]; 
   }
 
   void runVamp(String pathToAudioFile) {
@@ -53,6 +59,7 @@ class Data {
     }
   }
 
+  // Save data for faster running in the future
   void saveData(String filename) {
 
     String[] temp = new String[time.length];
@@ -63,6 +70,7 @@ class Data {
     saveStrings(filename,temp);
   }
 
+  // Load that data
   void loadData(String file) {
     String[] lines = loadStrings(file);
     int tempL= lines.length;

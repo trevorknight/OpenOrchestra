@@ -1,3 +1,6 @@
+// ---------
+// Variables
+// ---------
 import java.util.ArrayList;
 import jVamp.*;
 
@@ -11,6 +14,9 @@ String stuAudioFileName;
 Data reference;
 Data student;
 
+// ---------
+//
+// ---------
 
 void setup() {
   refAudioFileName = "SA-MB-09-002.wav";
@@ -18,8 +24,8 @@ void setup() {
   stuAudioFileName = "SA-XB-03-002.wav";
   pathToStuAudioFile = dataPath(stuAudioFileName);
   
-  reference = new Data();
-  student = new Data();
+  reference = new Data(color(0,30,255,120));
+  student = new Data(color(100,100,100,180));
 
   try {
     reference.loadData("reference.dat");
@@ -36,6 +42,10 @@ void setup() {
   
   findOnsets(reference);
   findOnsets(student);
+  
+  formNotes(reference);
+  formNotes(student);
+  
   
 }
 
