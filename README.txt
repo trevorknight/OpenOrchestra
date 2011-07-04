@@ -10,4 +10,4 @@ VAMP Plugin libraries:
 jVAMP library
 
 
-It also requires comparable audio to function.
+It also requires audio files of two performances of the same piece.

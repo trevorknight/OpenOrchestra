@@ -1,11 +1,20 @@
 void formNotes(Data data) {
-  int d;
   println("start of formNotes");
+  int d;
+  int endIndex;
   
-  for (int i = 0; i < data.onsets.length-1; i++) {
+  for (int i = 0; i < data.onsets.length; i++) {
     d = 0;
-
-    for (int j = data.onsets[i]; j < data.onsets[i+1]; j++) {
+    
+    //To make sure the last note gets processed
+    if ( i < data.onsets.length - 1 ) {
+      endIndex = data.onsets[i+1];      
+    } else {
+      endIndex = data.time.length;
+    }
+    
+    // Start at the onset, keep adding to the duration until there is silence (or next onset)
+    for (int j = data.onsets[i]; j < endIndex; j++) {
       if ( data.pitch[j] < 10 ) {
         break;
       } 
@@ -13,9 +22,11 @@ void formNotes(Data data) {
         d++;
       }
     }
-    println(data.onsets[i] + " " + d + " ");
+    
+    println(data.onsets[i] +" "+ d);
     Note tempNote = new Note(data.onsets[i], d, data.noteColor);
     data.notes = (Note[])append(data.notes, tempNote);
   }
-  
 }
+
+
