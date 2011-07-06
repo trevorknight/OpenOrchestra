@@ -1,12 +1,14 @@
 // Class for holding extracted data from recordings
 
 class Data {
+  color noteColor;
   float[] pitch;
+  float minPitch;
+  float maxPitch;
   float[] rms;
   float[] time;
   int[] onsets;
   Note[] notes;
-  color noteColor;
 
   Data(color _noteColor) {
     noteColor = _noteColor;
@@ -14,7 +16,7 @@ class Data {
     rms = new float[0];
     time = new float[0];
     onsets = new int[0];
-    notes = new Note[0]; 
+    notes = new Note[0];
   }
 
   void runVamp(String pathToAudioFile) {
@@ -42,7 +44,7 @@ class Data {
     rms = expand(rms, RMSFL.size());
     time = expand(time, RMSFL.size());
 
-    // Fill RMS array
+    // Fill arrays
 
     for(int i=0; i < RMSFL.size(); i++) {
       Feature f = RMSFL.get(i);
@@ -70,7 +72,7 @@ class Data {
     saveStrings(filename,temp);
   }
 
-  // Load that data
+  // Load data
   void loadData(String file) {
     String[] lines = loadStrings(file);
     int tempL= lines.length;
@@ -86,7 +88,18 @@ class Data {
         rms[i] = float(pieces[2]);
       }
     }
-  }  
+  }
 
+  void findMinMax() {
+    minPitch = 100;
+    for (float p : pitch) {
+      if (p > 10) {
+        minPitch = min(minPitch, p);
+      }
+    }
+    println(minPitch);
+    maxPitch = max(pitch);
+    println(maxPitch);
+  }
 }
 

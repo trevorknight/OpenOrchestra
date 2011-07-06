@@ -1,8 +1,10 @@
+//Adds an onset if it meets the criteria.
+
 void findOnsets(Data data) {
   boolean pitchDiscontinuityBefore;
   boolean noPitchDiscontinuityAfter;
   boolean atLeastThreePoints;
-  boolean noOnsetBefore;
+//  boolean noOnsetBefore;
 
   for (int i = 0; i < data.pitch.length-5; i++ ) {
     pitchDiscontinuityBefore = abs(data.pitch[i+1] - data.pitch[i]) > 0.5; 

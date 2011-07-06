@@ -1,6 +1,3 @@
-// ---------
-// Variables
-// ---------
 import java.util.ArrayList;
 import jVamp.*;
 
@@ -14,11 +11,12 @@ String stuAudioFileName;
 Data reference;
 Data student;
 
-// ---------
-//
-// ---------
+int startTime = 1000;
+int endTime = 3000;
 
 void setup() {
+  size(screen.width-100,screen.height-100);
+  
   refAudioFileName = "SA-MB-09-002.wav";
   pathToRefAudioFile = dataPath(refAudioFileName);
   stuAudioFileName = "SA-XB-03-002.wav";
@@ -37,17 +35,26 @@ void setup() {
     student.saveData("student.dat");
   }
   
+  reference.findMinMax();
+  student.findMinMax();
+ 
   filterPitch(reference);
   filterPitch(student);
-  
+
   findOnsets(reference);
   findOnsets(student);
   
   formNotes(reference);
   formNotes(student);
-  
-  
 }
+
+void draw() {
+  background(255);
+  for(Note n : reference.notes) {
+    n.display();
+  }
+}
+
 
 
 
