@@ -23,7 +23,7 @@ void formNotes(Data data) {
     }
     
     //println(data.onsets[i] +" "+ d);
-    Note tempNote = new Note(data.onsets[i], d, data);
+    Note tempNote = new Note(i, data.onsets[i], d, data);
     data.notes = (Note[])append(data.notes, tempNote);
   }
 }

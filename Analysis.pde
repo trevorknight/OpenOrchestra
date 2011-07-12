@@ -11,8 +11,10 @@ String stuAudioFileName;
 Data reference;
 Data student;
 
-int startTime = 1000;
-int endTime = 3000;
+int[] noteMatches;
+
+int startTime = 1300;
+int endTime = 1800;
 
 void setup() {
   size(screen.width-100,screen.height-100);
@@ -37,6 +39,9 @@ void setup() {
   
   reference.findMinMax();
   student.findMinMax();
+  
+  reference.setRmsScalar();
+  student.setRmsScalar();
  
   filterPitch(reference);
   filterPitch(student);
@@ -46,11 +51,19 @@ void setup() {
   
   formNotes(reference);
   formNotes(student);
+  
+  findAreasOfInterest(student, reference);
+  
+  noteMatches = matchNotes(student, reference);
 }
 
 void draw() {
+  smooth();
   background(255);
   for(Note n : reference.notes) {
+    n.display();
+  }
+  for(Note n : student.notes) {
     n.display();
   }
 }

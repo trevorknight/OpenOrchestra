@@ -6,6 +6,7 @@ class Data {
   float minPitch;
   float maxPitch;
   float[] rms;
+  float rmsScalar;
   float[] time;
   int[] onsets;
   Note[] notes;
@@ -97,9 +98,11 @@ class Data {
         minPitch = min(minPitch, p);
       }
     }
-    println(minPitch);
     maxPitch = max(pitch);
-    println(maxPitch);
+  }
+  
+  void setRmsScalar() {
+    rmsScalar = (1.0/max(rms));
   }
 }
 
