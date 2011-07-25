@@ -24,12 +24,10 @@ int[] findAreasOfInterest(Data student, Data reference) {
   for (int i = 0; i < student.time.length; i++ ) {
     if (i%cSize == 0 || i == student.time.length-1) {
       chunk++;
-      println("Chunk " + chunk);
       timeAOIs = sort(timeAOIs);
       pitchAOIs = sort(pitchAOIs);
       
       if ( pitchDiscrepancy > min(pitchAOIValues) ) {
-        println("Pitch " + pitchDiscrepancy + " " + min(pitchAOIValues) );
         for (int j = 0; j < pitchAOIs.length; j++) {
           if ( pitchAOIValues[j] == min(pitchAOIValues) ) {
             pitchAOIValues[j] = pitchDiscrepancy;
@@ -58,7 +56,6 @@ int[] findAreasOfInterest(Data student, Data reference) {
     }
 
     if ( student.pitch[i] > 5 && reference.pitch[i] > 5 ) {
-      println("there");
       pitchDiscrepancy += abs(student.pitch[i] - reference.pitch[i]);
     }
   }

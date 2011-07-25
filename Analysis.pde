@@ -12,9 +12,9 @@ Data reference;
 Data student;
 
 int[] noteMatches;
+int startTime = 0;
+int endTime = 19000;
 
-int startTime = 1300;
-int endTime = 1800;
 
 void setup() {
   size(screen.width-100,screen.height-100);
@@ -55,11 +55,17 @@ void setup() {
   findAreasOfInterest(student, reference);
   
   noteMatches = matchNotes(student, reference);
+  
+  startTime = 1300;
+  endTime = 2100;
+  //max(reference.time.length, student.time.length);
+  println("End time: " + endTime);
 }
 
 void draw() {
   smooth();
   background(255);
+  
   for(Note n : reference.notes) {
     n.display();
   }
@@ -68,7 +74,16 @@ void draw() {
   }
 }
 
-
+void keyPressed() {
+  if (keyCode >= 48 && keyCode <= 57) {
+    startTime = noteMatches[key] * 300;
+    endTime = startTime + 300;
+  }
+  if (key == 'h') {
+    startTime = 0;
+    endTime = 20000;
+  }
+}
 
 
 
