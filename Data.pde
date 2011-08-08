@@ -5,15 +5,17 @@ class Data {
   float[] pitch;
   float minPitch;
   float maxPitch;
+  float pitchOffset;
   float[] rms;
   float rmsScalar;
   float[] time;
   int[] onsets;
   Note[] notes;
 
-  Data(color _noteColor) {
+  Data(color _noteColor, float _pitchOffset) {
     noteColor = _noteColor;
     pitch = new float[0];
+    pitchOffset = _pitchOffset;
     rms = new float[0];
     time = new float[0];
     onsets = new int[0];
@@ -102,7 +104,7 @@ class Data {
   }
   
   void setRmsScalar() {
-    rmsScalar = (1.0/max(rms));
+    rmsScalar = (2.5/max(rms));
   }
 }
 

@@ -24,14 +24,12 @@ int[] findAreasOfInterest(Data student, Data reference) {
   for (int i = 0; i < student.time.length; i++ ) {
     if (i%cSize == 0 || i == student.time.length-1) {
       chunk++;
-      timeAOIs = sort(timeAOIs);
-      pitchAOIs = sort(pitchAOIs);
-      
+           
       if ( pitchDiscrepancy > min(pitchAOIValues) ) {
         for (int j = 0; j < pitchAOIs.length; j++) {
           if ( pitchAOIValues[j] == min(pitchAOIValues) ) {
             pitchAOIValues[j] = pitchDiscrepancy;
-            pitchAOIs[j] = chunk;
+            pitchAOIs[j] = i;
             break;
           }
         }
@@ -41,7 +39,8 @@ int[] findAreasOfInterest(Data student, Data reference) {
         for (int j = 0; j < timeAOIs.length; j++) {
           if ( timeAOIValues[j] == min(timeAOIValues) ) {
             timeAOIValues[j] = timeDiscrepancy;
-            timeAOIs[j] = chunk;
+            timeAOIs[j] = i;
+            println(timeAOIValues);
             break;
           }
         }
@@ -51,7 +50,7 @@ int[] findAreasOfInterest(Data student, Data reference) {
       timeDiscrepancy = 0;
     }
 
-    if ( (student.pitch[i] < 5) ^ (reference.pitch[i] < 5)) {
+    if ( (student.pitch[i] < 5) && (reference.pitch[i] > 5) || ((student.pitch[i] > 5) && (reference.pitch[i] < 5))) {
       timeDiscrepancy++;
     }
 
@@ -59,8 +58,10 @@ int[] findAreasOfInterest(Data student, Data reference) {
       pitchDiscrepancy += abs(student.pitch[i] - reference.pitch[i]);
     }
   }
-  println(timeAOIs);
-  println(pitchAOIs);
+//  println(timeAOIs);
+//  println(timeAOIValues);
+//  println(pitchAOIs);
+//  println(pitchAOIValues);
   
   return concat(timeAOIs,pitchAOIs);
 }
