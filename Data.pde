@@ -29,47 +29,47 @@ class Data {
     text(name, x, y);
   }
 
-  void runVamp(String pathToAudioFile) {
-
-    // Pitch plugin setup
-    Plugin pitchPlugin = jvamp.getPlugin("aubiopitch");
-    pitchPlugin.setParameter("pitchtype",4.0f);
-    pitchPlugin.setParameter("minfreq", 60);
-    pitchPlugin.setParameter("maxfreq", 1200);
-    pitchPlugin.setParameter("wraprange", 0.0f);
-    pitchPlugin.setParameter("silencethreshold", -60.0f);
-
-    // RMS plugin setup
-    Plugin RMSPlugin = jvamp.getPlugin("rms_amplitude");
-
-    // Run
-    FeatureList PitchFL = pitchPlugin.run(pathToAudioFile, "Fundamental Frequency");
-    FeatureList RMSFL = RMSPlugin.run(pathToAudioFile, "RMS Amplitude");
-
-    convertFreqToNumber(PitchFL);
-
-    // Initialize arrays
-
-    pitch = expand(pitch, RMSFL.size());
-    rms = expand(rms, RMSFL.size());
-    time = expand(time, RMSFL.size());
-
-    // Fill arrays
-
-    for(int i=0; i < RMSFL.size(); i++) {
-      Feature f = RMSFL.get(i);
-      time[i] = f.getTimeMs();
-      rms[i] = f.values[0];
-      FeatureList tempFL = PitchFL.getFeatures(time[i]-1, time[i]+1);
-      if (tempFL.size() == 1) {
-        Feature tempF = tempFL.get(0);
-        pitch[i] = tempF.values[0];
-      } 
-      else if (tempFL.size() > 1) {
-        println("more than one!");
-      }
-    }
-  }
+//  void runVamp(String pathToAudioFile) {
+//
+//    // Pitch plugin setup
+//    Plugin pitchPlugin = jvamp.getPlugin("aubiopitch");
+//    pitchPlugin.setParameter("pitchtype",4.0f);
+//    pitchPlugin.setParameter("minfreq", 60);
+//    pitchPlugin.setParameter("maxfreq", 1200);
+//    pitchPlugin.setParameter("wraprange", 0.0f);
+//    pitchPlugin.setParameter("silencethreshold", -60.0f);
+//
+//    // RMS plugin setup
+//    Plugin RMSPlugin = jvamp.getPlugin("rms_amplitude");
+//
+//    // Run
+//    FeatureList PitchFL = pitchPlugin.run(pathToAudioFile, "Fundamental Frequency");
+//    FeatureList RMSFL = RMSPlugin.run(pathToAudioFile, "RMS Amplitude");
+//
+//    convertFreqToNumber(PitchFL);
+//
+//    // Initialize arrays
+//
+//    pitch = expand(pitch, RMSFL.size());
+//    rms = expand(rms, RMSFL.size());
+//    time = expand(time, RMSFL.size());
+//
+//    // Fill arrays
+//
+//    for(int i=0; i < RMSFL.size(); i++) {
+//      Feature f = RMSFL.get(i);
+//      time[i] = f.getTimeMs();
+//      rms[i] = f.values[0];
+//      FeatureList tempFL = PitchFL.getFeatures(time[i]-1, time[i]+1);
+//      if (tempFL.size() == 1) {
+//        Feature tempF = tempFL.get(0);
+//        pitch[i] = tempF.values[0];
+//      } 
+//      else if (tempFL.size() > 1) {
+//        println("more than one!");
+//      }
+//    }
+//  }
 
   // Save data for faster running in the future
   void saveData(String filename) {

@@ -1,10 +1,10 @@
 // DEPENDENCIES
-import jVamp.*;
+//import jVamp.*;
 PFont font;
 import krister.Ess.*;
 
 // VAMP
-JVamp jvamp = new JVamp(this);
+//JVamp jvamp = new JVamp(this);
 
 // DATA
 String pathToRefAudioFile;
@@ -21,6 +21,7 @@ int[] areasOfInterest;
 // INTERFACE
 int startTime;
 int endTime;
+int maxTime;
 int targetStartTime;
 int targetEndTime;
 
@@ -55,15 +56,15 @@ void setup() {
   student = new Data(color(100,100,100,180), 4.0/7.0, "You (1st Alto)");
 
   // VAMP/LOAD
-  try {
+//  try {
     reference.loadData("reference.dat");
     student.loadData("student.dat");
-  } catch (Exception e) {
-    reference.runVamp(pathToRefAudioFile);
-    reference.saveData("reference.dat");
-    student.runVamp(pathToStuAudioFile);
-    student.saveData("student.dat");
-  }
+//  } catch (Exception e) {
+//    reference.runVamp(pathToRefAudioFile);
+//    reference.saveData("reference.dat");
+//    student.runVamp(pathToStuAudioFile);
+//    student.saveData("student.dat");
+//  }
   
   reference.findMinMax();
   student.findMinMax();
@@ -77,6 +78,9 @@ void setup() {
   formNotes(student);
   areasOfInterest = findAreasOfInterest(student, reference);
   noteMatches = matchNotes(student, reference);
+  
+  maxTime = min(student.time.length, reference.time.length)-1;
+
   
   // INTERFACE
   startTime = 0;
@@ -177,15 +181,15 @@ void keyPressed() {
   }
   if (key == 'h') {
     targetStartTime = 0;
-    targetEndTime = 20000;
+    targetEndTime = maxTime;
   }
   if (keyCode == 37) {
-    targetStartTime = constrain(startTime-50,0,20000);
-    targetEndTime = constrain(endTime-50,0,20000);
+    targetStartTime = constrain(startTime-50,0,maxTime);
+    targetEndTime = constrain(endTime-50,0,maxTime);
   }
   if (keyCode == 39) {
-    targetStartTime = constrain(startTime+50,0,20000);
-    targetEndTime = constrain(endTime+50,0,20000);
+    targetStartTime = constrain(startTime+50,0,maxTime);
+    targetEndTime = constrain(endTime+50,0,maxTime);
   }
   findTimesSetInsOuts();
 }
@@ -200,13 +204,13 @@ void moveView() {
 
 void mousePressed() {
   if (leftButton.pressed()){
-    targetStartTime = constrain(startTime-275,0,20000);
-    targetEndTime = constrain(endTime-275,0,20000);
+    targetStartTime = constrain(startTime-275,0,maxTime);
+    targetEndTime = constrain(endTime-275,0,maxTime);
     findTimesSetInsOuts();
   }
   if (rightButton.pressed()) {
-    targetStartTime = constrain(startTime+275,0,20000);
-    targetEndTime = constrain(endTime+275,0,20000);
+    targetStartTime = constrain(startTime+275,0,maxTime);
+    targetEndTime = constrain(endTime+275,0,maxTime);
     findTimesSetInsOuts();
   }
   for (int i = 0; i < visualizationButtons.length; i++) {
