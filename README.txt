@@ -1,13 +1,11 @@
 README for OpenOrchestra
 TrevorKnight@gmail.com
 
-This processing code requires additional components:
+This processing code requires this library:
+http://www.tree-axis.com/Ess/
 
-VAMP Plugin libraries:
--libextract
--aubio
-
-jVAMP library
-
-
-It also requires audio files of two performances of the same piece.
+In order to run VAMP plugins in Processing (currently commented out), 
+the code requires:
+-jVAMP library
+-aubio VAMP plugins
+-libxtract VAMP plugins

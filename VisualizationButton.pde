@@ -18,12 +18,12 @@ class VisualizationButton {
   }
 
   void changeColor() {
-    if (active) {
-      fill(200);
-    } 
-    else {
+//    if (active) {
+//      fill(200);
+//    } 
+//    else {
       noFill();
-    }
+//    }
   }
 
   void display() {
@@ -31,7 +31,10 @@ class VisualizationButton {
     stroke(200);
     strokeWeight(0.5);
     rect(x,y,w,h);
-
+    if (active) {
+      strokeWeight(3);
+      line(x,y+h+5,x+w,y+h+5);
+    }
   }
 
   boolean pressed() {

@@ -247,9 +247,7 @@ void findTimesSetInsOuts() {
   referenceChannel.stop();
   studentChannel.stop();  
   startTimeMS = int(student.time[targetStartTime]);
-  println(startTimeMS);
   endTimeMS = int(student.time[targetEndTime]);
-  println(endTimeMS);
   referenceChannel.in(referenceChannel.frames(startTimeMS));
   studentChannel.in(studentChannel.frames(startTimeMS));
   referenceChannel.out(referenceChannel.frames(endTimeMS));
