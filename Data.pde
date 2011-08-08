@@ -1,6 +1,7 @@
 // Class for holding extracted data from recordings
 
 class Data {
+  String name;
   color noteColor;
   float[] pitch;
   float minPitch;
@@ -12,7 +13,8 @@ class Data {
   int[] onsets;
   Note[] notes;
 
-  Data(color _noteColor, float _pitchOffset) {
+  Data(color _noteColor, float _pitchOffset, String _name) {
+    name = _name;
     noteColor = _noteColor;
     pitch = new float[0];
     pitchOffset = _pitchOffset;
@@ -20,6 +22,11 @@ class Data {
     time = new float[0];
     onsets = new int[0];
     notes = new Note[0];
+  }
+  
+  void showLegend(float x, float y) {
+    fill(noteColor);
+    text(name, x, y);
   }
 
   void runVamp(String pathToAudioFile) {
