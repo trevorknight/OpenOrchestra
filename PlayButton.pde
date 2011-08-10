@@ -18,31 +18,22 @@ class PlayButton {
   }
   
   void displayStopped(float mx, float my) {
-    noFill();
-    stroke(200);
-    strokeWeight(1);
     ellipseMode(CENTER);
+    noStroke();
+    fill(200);
+    strokeWeight(1);
     ellipse(x,y,d,d);
-    if (contains(mx,my)) {
-      fill(200);
-    }else{
-      noFill();
-    }
+    fill(255);
     triangle(x-d/5,y-d/3.5,x-d/5,y+d/3.5,x+d/3,y);
   }
   void displayPlaying(float mx, float my) {
-    noFill();
-    stroke(200);
+    noStroke();
+    fill(200);
     strokeWeight(1);
     ellipseMode(CENTER);
     ellipse(x,y,d,d);
-    if (contains(mx,my)) {
-      fill(200);
-    }else{
-      noFill();
-    }
+    fill(255);
     rectMode(CENTER);
     rect(x,y,d/2,d/2);
-    stroke(240,22,22);
   } 
 }

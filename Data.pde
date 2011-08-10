@@ -8,6 +8,7 @@ class Data {
   float maxPitch;
   float pitchOffset;
   float[] rms;
+  float[] rmsSmoothed;
   float rmsScalar;
   float[] time;
   int[] onsets;
@@ -19,9 +20,11 @@ class Data {
     pitch = new float[0];
     pitchOffset = _pitchOffset;
     rms = new float[0];
+    rmsSmoothed = new float[0];
     time = new float[0];
     onsets = new int[0];
     notes = new Note[0];
+
   }
   
   void showLegend(float x, float y) {
@@ -98,6 +101,8 @@ class Data {
         rms[i] = float(pieces[2]);
       }
     }
+    
+    rmsSmoothed = runningAverage(rms, 3);
   }
 
   void findMinMax() {

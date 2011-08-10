@@ -16,7 +16,7 @@ class Note {
     startIndex = _startIndex;
     duration = _duration;
     data = _dataInstance;
-    offset = map(data.pitchOffset,0,1,data.maxPitch,data.minPitch);
+    offset = map(data.pitchOffset,0,1,globalMaxPitch,globalMinPitch);
 
     // Determine average pitch
     avgPitch = 0;
@@ -26,7 +26,7 @@ class Note {
     avgPitch /= (duration);
   }
 
-  void displayA(int leftBorder, int rightBorder, int topBorder, int bottomBorder) {  
+  void displayA(int leftBorder, int rightBorder, int topBorder, int bottomBorder) {
     if (startIndex + duration > startTime && startIndex < endTime) {
       //Note bodies
       fill(data.noteColor);
@@ -34,19 +34,18 @@ class Note {
       stroke(0);
       noStroke();
       float xPoint;
-      float yPoint;
-      
+      float yPoint;      
       beginShape();
       //  Along the bottom 
       for (int i = startIndex; i < startIndex + duration; i++) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
-        yPoint = map(data.pitch[i] + data.rms[i] * data.rmsScalar, data.minPitch, data.maxPitch, bottomBorder, topBorder);
+        yPoint = map(data.pitch[i] + data.rms[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
         if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
       }
       // Back along the top
       for (int i = startIndex + duration - 1; i > startIndex-1; i--) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
-        yPoint = map(data.pitch[i] - data.rms[i] * data.rmsScalar, data.minPitch, data.maxPitch, bottomBorder, topBorder);
+        yPoint = map(data.pitch[i] - data.rms[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
         if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
       }
       endShape(CLOSE);
@@ -66,7 +65,7 @@ class Note {
       //  Along the bottom 
       for (int i = startIndex; i < startIndex + duration; i++) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
-        yPoint = map(data.pitch[i], data.minPitch, data.maxPitch, bottomBorder, topBorder);
+        yPoint = map(data.pitch[i], globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
         if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
       }
       endShape();
@@ -83,15 +82,15 @@ class Note {
   
       beginShape();
       //  Along the bottom 
-      for (int i = startIndex; i < startIndex + duration; i++) {
+      for (int i = startIndex; i < startIndex + duration+1; i++) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
-        yPoint = map(offset + data.rms[i] * data.rmsScalar, data.minPitch, data.maxPitch, bottomBorder, topBorder);
+        yPoint = map(offset + data.rmsSmoothed[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
         if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
       }
       // Back along the top
-      for (int i = startIndex + duration - 1; i > startIndex-1; i--) {
+      for (int i = startIndex + duration; i > startIndex-1; i--) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
-        yPoint = map(offset - data.rms[i] * data.rmsScalar, data.minPitch, data.maxPitch, bottomBorder, topBorder);
+        yPoint = map(offset - data.rmsSmoothed[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
         if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
       }
       endShape(CLOSE);

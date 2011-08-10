@@ -40,7 +40,6 @@ int[] findAreasOfInterest(Data student, Data reference) {
           if ( timeAOIValues[j] == min(timeAOIValues) ) {
             timeAOIValues[j] = timeDiscrepancy;
             timeAOIs[j] = i;
-            println(timeAOIValues);
             break;
           }
         }
@@ -58,11 +57,7 @@ int[] findAreasOfInterest(Data student, Data reference) {
       pitchDiscrepancy += abs(student.pitch[i] - reference.pitch[i]);
     }
   }
-//  println(timeAOIs);
-//  println(timeAOIValues);
-//  println(pitchAOIs);
-//  println(pitchAOIValues);
-  
+ 
   return concat(timeAOIs,pitchAOIs);
 }
 

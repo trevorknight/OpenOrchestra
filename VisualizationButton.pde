@@ -27,6 +27,7 @@ class VisualizationButton {
   }
 
   void display() {
+    // LABEL?
     rectMode(CORNER);
     stroke(200);
     strokeWeight(0.5);

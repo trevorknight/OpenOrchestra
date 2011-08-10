@@ -15,8 +15,15 @@ String stuAudioFileName;
 Data reference;
 Data student;
 
+float globalMinPitch;
+float globalMaxPitch;
 int[] noteMatches;
 int[] areasOfInterest;
+int[] measureStartTimes;
+int[] measureStartIndices;
+int currentMeasure;
+int lastMeasure;
+float[] keySignature = {55, 58, 62, 65, 69};  //key for leger lines
 
 // INTERFACE
 int startTime;
@@ -38,10 +45,18 @@ PlayButton playReference;
 PlayButton playStudent;
 int startTimeMS;
 int endTimeMS;
+boolean justStartedReference;
+int referenceStartTime;
+float referencePlayPosition;
+boolean justStartedStudent;
+int studentStartTime;
+float studentPlayPosition;
+int currentTime;
+float playbackDuration;
 
 // =============================================
 void setup() {
-  size(1400,1000);
+  size(1400,900);
   font = loadFont("ArialUnicodeMS-20.vlw");
   textFont(font, 20);
   
@@ -54,8 +69,8 @@ void setup() {
   
   reference = new Data(color(0,30,255,120), 3.0/7.0, "Reference");
   student = new Data(color(100,100,100,180), 4.0/7.0, "You (1st Alto)");
-
-  // VAMP/LOAD
+  
+// VAMP/LOAD
 //  try {
     reference.loadData("reference.dat");
     student.loadData("student.dat");
@@ -66,8 +81,18 @@ void setup() {
 //    student.saveData("student.dat");
 //  }
   
+  measureStartTimes = new int[163];
+  measureStartIndices = new int[163];
+  findMeasureStartIndices();
+  currentMeasure = 0;
+  lastMeasure = 162;
+  
   reference.findMinMax();
   student.findMinMax();
+  globalMinPitch = min(student.minPitch, reference.minPitch);
+  globalMaxPitch = max(student.maxPitch, reference.maxPitch);
+  println(globalMinPitch);
+  println(globalMaxPitch);
   reference.setRmsScalar();
   student.setRmsScalar();
   filterPitch(reference);
@@ -78,7 +103,6 @@ void setup() {
   formNotes(student);
   areasOfInterest = findAreasOfInterest(student, reference);
   noteMatches = matchNotes(student, reference);
-  
   maxTime = min(student.time.length, reference.time.length)-1;
 
   
@@ -88,8 +112,8 @@ void setup() {
   targetStartTime = 0;
   targetEndTime = 300;
 
-  leftButton = new ScrollButton(70,0.85*height,50,"left");
-  rightButton = new ScrollButton(width-70, 0.85*height, 50, "right");
+  leftButton = new ScrollButton(70,height-50, 40,"left");
+  rightButton = new ScrollButton(width-70, height-50, 40, "right");
   visualizationButtonCorners[0] = width/2-180;
   visualizationButtonCorners[1] = width/2-30;
   visualizationButtonCorners[2] = width/2+120;
@@ -108,16 +132,21 @@ void setup() {
   referenceChannel.bufferSize(referenceChannel.frames(500));
   studentChannel.bufferSize(studentChannel.frames(500));
   findTimesSetInsOuts();
-  playReference = new PlayButton(60,height*0.35,35);
-  playStudent = new PlayButton(60,height*0.65,35);
+  playReference = new PlayButton(60,height*0.075,35);
+  playStudent = new PlayButton(60,height*0.125,35);
+  justStartedReference = false;
+  justStartedStudent = false;
 }
 
 void draw() {
   smooth();
   background(255);
   fill(200);
-  text("Basie-Straight Ahead :: Measure " + startTime/300, width-400, 50);
-  
+  text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50); //ADD TOTAL BARS
+  reference.showLegend(85,0.08*height);
+  student.showLegend(85,0.13*height);
+
+  // MAIN VISUALIZATION
   int left = 0;
   int right = width;
   int top = 85;
@@ -133,6 +162,7 @@ void draw() {
     if (visualizationButtons[2].active) {n.displayC(left, right, top, bottom);}
   }
   
+  // VISUALIZATION BUTTONS
   for(VisualizationButton v : visualizationButtons) {
     v.changeColor();
     v.display();
@@ -151,29 +181,60 @@ void draw() {
     if (!visualizationButtons[2].active) {n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]); n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]);}
   }
   
+  if (visualizationButtons[0].active || visualizationButtons[1].active) {
+    stroke(0);
+    strokeWeight(1);
+    for (float f : keySignature) {
+      float ksPoint = map(f,globalMinPitch,globalMaxPitch,height,0);
+      line(0,ksPoint,width,ksPoint);
+    }
+  }
+  
+  //SCROLLING
   rightButton.display();
   leftButton.display();
   moveView();
-  reference.showLegend(85,0.355*height);
-  student.showLegend(85,0.655*height);
+
   
   // AUDIO
   
   if (referenceChannel.state==Ess.STOPPED) {
     playReference.displayStopped(mouseX,mouseY);
+    if (justStartedReference) justStartedReference = false;
   }
   else {
+    if (!justStartedReference) {
+      justStartedReference = true;
+      referenceStartTime = millis();
+    }
+    currentTime = millis();
+    referencePlayPosition = lerp(0,width,float(currentTime-referenceStartTime)/playbackDuration);
+    strokeWeight(2);
+    stroke(reference.noteColor);
+    line(referencePlayPosition,0,referencePlayPosition,height);
     playReference.displayPlaying(mouseX,mouseY);
   }
 
   if (studentChannel.state==Ess.STOPPED) {
     playStudent.displayStopped(mouseX,mouseY);
+    if (justStartedStudent) justStartedStudent = false;
   }
   else {
+    if (!justStartedStudent) {
+      justStartedStudent = true;
+      studentStartTime = millis();
+    }
+    currentTime = millis();
+    studentPlayPosition = lerp(0,width,float(currentTime-studentStartTime)/playbackDuration);
+    strokeWeight(2);
+    stroke(student.noteColor);
+    line(studentPlayPosition,0,studentPlayPosition,height);
     playStudent.displayPlaying(mouseX,mouseY);
   }
 }
 
+
+// KEY AND BUTTON PRESSES
 void keyPressed() {
   if (keyCode >= 48 && keyCode <= 57) {
     targetStartTime = areasOfInterest[keyCode-48];
@@ -183,35 +244,17 @@ void keyPressed() {
     targetStartTime = 0;
     targetEndTime = maxTime;
   }
-  if (keyCode == 37) {
-    targetStartTime = constrain(startTime-50,0,maxTime);
-    targetEndTime = constrain(endTime-50,0,maxTime);
-  }
-  if (keyCode == 39) {
-    targetStartTime = constrain(startTime+50,0,maxTime);
-    targetEndTime = constrain(endTime+50,0,maxTime);
-  }
   findTimesSetInsOuts();
-}
-
-void moveView() {
-  if ( (startTime != targetStartTime) || (endTime != targetEndTime) ) {
-    
-    startTime = ceil(lerp(float(startTime), float(targetStartTime), 0.1));
-    endTime = ceil(lerp(float(endTime), float(targetEndTime), 0.1));
-  }
 }
 
 void mousePressed() {
   if (leftButton.pressed()){
-    targetStartTime = constrain(startTime-275,0,maxTime);
-    targetEndTime = constrain(endTime-275,0,maxTime);
-    findTimesSetInsOuts();
+    if (currentMeasure != 0) currentMeasure -= 1;
+    setNewStartEnd();
   }
   if (rightButton.pressed()) {
-    targetStartTime = constrain(startTime+275,0,maxTime);
-    targetEndTime = constrain(endTime+275,0,maxTime);
-    findTimesSetInsOuts();
+    if (currentMeasure != lastMeasure) currentMeasure += 1;
+    setNewStartEnd();
   }
   for (int i = 0; i < visualizationButtons.length; i++) {
     if (visualizationButtons[i].pressed()) {
@@ -243,17 +286,8 @@ void mousePressed() {
   }
 }
 
-void findTimesSetInsOuts() {
-  referenceChannel.stop();
-  studentChannel.stop();  
-  startTimeMS = int(student.time[targetStartTime]);
-  endTimeMS = int(student.time[targetEndTime]);
-  referenceChannel.in(referenceChannel.frames(startTimeMS));
-  studentChannel.in(studentChannel.frames(startTimeMS));
-  referenceChannel.out(referenceChannel.frames(endTimeMS));
-  studentChannel.out(studentChannel.frames(endTimeMS));
-  referenceChannel.cue(referenceChannel.frames(startTimeMS));
-  studentChannel.cue(studentChannel.frames(startTimeMS));
+void audioChannelDone(AudioChannel ch) {
+  ch.cue(referenceChannel.frames(startTimeMS));
 }
 
 public void stop() {
