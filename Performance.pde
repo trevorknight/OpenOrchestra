@@ -12,4 +12,10 @@ class Performance {
   int playStartTime;
   float playPosition;
   
+  Performance(String _name, String _audioFileName, color _noteColor) {
+    name = _name;
+    audioFileName = _audioFileName;
+    noteColor = _noteColor;
+    
+  
 }

@@ -7,6 +7,8 @@ import krister.Ess.*;
 //JVamp jvamp = new JVamp(this);
 
 // DATA
+Performance[] performances;
+
 String pathToRefAudioFile;
 String refAudioFileName;
 String pathToStuAudioFile;
@@ -61,7 +63,9 @@ void setup() {
   textFont(font, 20);
   
   
-  // DATA
+  // PERFORMANCES
+  performances = new Performance[2];
+  performances[0] = new Performance(
   refAudioFileName = "SA-MB-09-002.wav";
   pathToRefAudioFile = dataPath(refAudioFileName);
   stuAudioFileName = "SA-XB-03-002.wav";
@@ -87,20 +91,27 @@ void setup() {
   currentMeasure = 0;
   lastMeasure = 162;
   
-  reference.findMinMax();
-  student.findMinMax();
+  for (Performance p : performances) {
+    p.findMinMax();
+    p.setRmsScalar();
+    p.filterPitch();
+    p.findOnsets();
+    p.formNotes();
+  }
+  
+    reference.findMinMax();
+    student.findMinMax();
+    reference.setRmsScalar();
+    student.setRmsScalar();
+    reference.filterPitch();
+    student.filterPitch();
+    reference.findOnsets();
+    student.findOnsets();
+    reference.formNotes();
+    student.formNotes();
+
   globalMinPitch = min(student.minPitch, reference.minPitch);
-  globalMaxPitch = max(student.maxPitch, reference.maxPitch);
-  println(globalMinPitch);
-  println(globalMaxPitch);
-  reference.setRmsScalar();
-  student.setRmsScalar();
-  filterPitch(reference);
-  filterPitch(student);
-  findOnsets(reference);
-  findOnsets(student);
-  formNotes(reference);
-  formNotes(student);
+  globalMaxPitch = max(student.maxPitch, reference.maxPitch);    
   areasOfInterest = findAreasOfInterest(student, reference);
   noteMatches = matchNotes(student, reference);
   maxTime = min(student.time.length, reference.time.length)-1;
@@ -171,17 +182,17 @@ void draw() {
   top = visualizationButtonCorners[3];
   bottom = visualizationButtonCorners[3]+visualizationButtonDimensions[1];
   for(Note n : reference.notes) {
-    if (!visualizationButtons[0].active) {n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);}
-    if (!visualizationButtons[1].active) {n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom); n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);}
-    if (!visualizationButtons[2].active) {n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom); n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom);}
+    n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
+    n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
+    n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
   }
   for(Note n : student.notes) {
-    if (!visualizationButtons[0].active) {n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]); n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]);}
-    if (!visualizationButtons[1].active) {n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]); n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]);}
-    if (!visualizationButtons[2].active) {n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]); n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],visualizationButtonCorners[3],visualizationButtonCorners[3]+visualizationButtonDimensions[1]);}
+    n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
+    n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
+    n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
   }
   
-  if (visualizationButtons[0].active || visualizationButtons[1].active) {
+  if (visualizationButtons[0].active) {
     stroke(0);
     strokeWeight(1);
     for (float f : keySignature) {

@@ -8,6 +8,7 @@ class Data {
   float maxPitch;
   float pitchOffset;
   float[] rms;
+  float maxRms;
   float[] rmsSmoothed;
   float rmsScalar;
   float[] time;
@@ -104,6 +105,62 @@ class Data {
     
     rmsSmoothed = runningAverage(rms, 3);
   }
+  
+  // Removes a point of pitch information if it's farther than one semitone from its neighbours.
+  void filterPitch() {
+    for(int i = 2; i < pitch.length-1; i++) {
+      if( abs(pitch[i] - pitch[i-1]) > 1 && abs(pitch[i] - pitch[i+1]) > 1) {
+        pitch[i] = 0;
+      }
+    }
+  }
+  
+  //Adds an onset if it meets the criteria.
+  void findOnsets() {
+    boolean pitchDiscontinuityBefore;
+    boolean noPitchDiscontinuityAfter;
+    boolean atLeastThreePoints;
+  
+    for (int i = 0; i < pitch.length-5; i++ ) {
+      pitchDiscontinuityBefore = abs(pitch[i+1] - pitch[i]) > 0.5; 
+      noPitchDiscontinuityAfter = abs(pitch[i+1] - pitch[i+2]) < 0.5;
+      atLeastThreePoints = (pitch[i+1] > 10) && (pitch[i+2] > 10) && (pitch[i+3] > 10);
+      if (pitchDiscontinuityBefore && noPitchDiscontinuityAfter && atLeastThreePoints) {
+        onsets = append(onsets, i+1);
+      }
+    }
+  }
+  
+  // Creates an array of note objects for each data
+  void formNotes() {
+    int d;
+    int endIndex;
+    
+    for (int i = 0; i < onsets.length; i++) {
+      d = 0;
+      
+      //To make sure the last note gets processed
+      if ( i < onsets.length - 1 ) {
+        endIndex = onsets[i+1];      
+      } else {
+        endIndex = time.length;
+      }
+      
+      // Start at the onset, keep adding to the duration until there is silence (or next onset)
+      for (int j = onsets[i]; j < endIndex; j++) {
+        if ( pitch[j] < 10 ) {
+          break;
+        } 
+        else {
+          d++;
+        }
+      }
+      
+      //println(data.onsets[i] +" "+ d);
+      Note tempNote = new Note(i, onsets[i], d, this);
+      notes = (Note[])append(notes, tempNote);
+    }
+  }
 
   void findMinMax() {
     minPitch = 100;
@@ -113,10 +170,11 @@ class Data {
       }
     }
     maxPitch = max(pitch);
+    maxRms = max(rms);
   }
   
   void setRmsScalar() {
-    rmsScalar = (2.5/max(rms));
+    rmsScalar = (3.3/max(rms));
   }
 }
 
