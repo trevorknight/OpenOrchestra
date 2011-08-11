@@ -64,8 +64,9 @@ void setup() {
   
   
   // PERFORMANCES
-  performances = new Performance[2];
-  performances[0] = new Performance(
+//  performances = new Performance[2];
+//  performances[0] = new Performance("Reference", "SA-MB-09-002.wav", color(0,30,255,120));
+//  performances[1] = new Performance("You (1st Alto)", "SA-XB-03-002.wav", color(100,100,100,180));
   refAudioFileName = "SA-MB-09-002.wav";
   pathToRefAudioFile = dataPath(refAudioFileName);
   stuAudioFileName = "SA-XB-03-002.wav";
@@ -91,27 +92,30 @@ void setup() {
   currentMeasure = 0;
   lastMeasure = 162;
   
-  for (Performance p : performances) {
-    p.findMinMax();
-    p.setRmsScalar();
-    p.filterPitch();
-    p.findOnsets();
-    p.formNotes();
-  }
+//  for (Performance p : performances) {
+//    p.findMinMax();
+//    p.setRmsScalar();
+//    p.filterPitch();
+//    p.findOnsets();
+//    p.formNotes();
+//  }
   
-    reference.findMinMax();
-    student.findMinMax();
-    reference.setRmsScalar();
-    student.setRmsScalar();
-    reference.filterPitch();
-    student.filterPitch();
-    reference.findOnsets();
-    student.findOnsets();
-    reference.formNotes();
-    student.formNotes();
-
+  reference.findMinMax();
+  student.findMinMax();
+  
   globalMinPitch = min(student.minPitch, reference.minPitch);
-  globalMaxPitch = max(student.maxPitch, reference.maxPitch);    
+  globalMaxPitch = max(student.maxPitch, reference.maxPitch);  
+
+  reference.setRmsScalar();
+  student.setRmsScalar();
+  reference.filterPitch();
+  student.filterPitch();
+  reference.findOnsets();
+  student.findOnsets();
+  reference.formNotes();
+  student.formNotes();
+
+  
   areasOfInterest = findAreasOfInterest(student, reference);
   noteMatches = matchNotes(student, reference);
   maxTime = min(student.time.length, reference.time.length)-1;
@@ -131,9 +135,9 @@ void setup() {
   visualizationButtonCorners[3] = height-85;
   visualizationButtonDimensions[0] = 120;
   visualizationButtonDimensions[1] = 70;
-  visualizationButtons[0] = new VisualizationButton(visualizationButtonCorners[0],visualizationButtonCorners[3],visualizationButtonDimensions[0],visualizationButtonDimensions[1]);
-  visualizationButtons[1] = new VisualizationButton(visualizationButtonCorners[1],visualizationButtonCorners[3],visualizationButtonDimensions[0],visualizationButtonDimensions[1]);
-  visualizationButtons[2] = new VisualizationButton(visualizationButtonCorners[2],visualizationButtonCorners[3],visualizationButtonDimensions[0],visualizationButtonDimensions[1]);
+  visualizationButtons[0] = new VisualizationButton("Intonation",visualizationButtonCorners[0],visualizationButtonCorners[3],visualizationButtonDimensions[0],visualizationButtonDimensions[1]);
+  visualizationButtons[1] = new VisualizationButton("Articulation",visualizationButtonCorners[1],visualizationButtonCorners[3],visualizationButtonDimensions[0],visualizationButtonDimensions[1]);
+  visualizationButtons[2] = new VisualizationButton("Dynamics",visualizationButtonCorners[2],visualizationButtonCorners[3],visualizationButtonDimensions[0],visualizationButtonDimensions[1]);
   visualizationButtons[0].active = true;
   
   // AUDIO
@@ -153,7 +157,7 @@ void draw() {
   smooth();
   background(255);
   fill(200);
-  text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50); //ADD TOTAL BARS
+  text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50);
   reference.showLegend(85,0.08*height);
   student.showLegend(85,0.13*height);
 
@@ -163,19 +167,18 @@ void draw() {
   int top = 85;
   int bottom = height-85;
   for(Note n : reference.notes) {
-    if (visualizationButtons[0].active) {n.displayA(left, right, top, bottom);}
-    if (visualizationButtons[1].active) {n.displayB(left, right, top, bottom);}
-    if (visualizationButtons[2].active) {n.displayC(left, right, top, bottom);}
+    if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
+    if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
+    if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
   }
   for(Note n : student.notes) {
-    if (visualizationButtons[0].active) {n.displayA(left, right, top, bottom);}
-    if (visualizationButtons[1].active) {n.displayB(left, right, top, bottom);}
-    if (visualizationButtons[2].active) {n.displayC(left, right, top, bottom);}
+    if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
+    if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
+    if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
   }
   
   // VISUALIZATION BUTTONS
   for(VisualizationButton v : visualizationButtons) {
-    v.changeColor();
     v.display();
   }
   

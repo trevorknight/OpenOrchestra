@@ -1,6 +1,6 @@
 class VisualizationButton {
 
-  //Variables
+  String name;
   int x;
   int y;
   int w;
@@ -9,7 +9,8 @@ class VisualizationButton {
 
 
   //Constructor
-  VisualizationButton(int _x, int _y, int _w, int _h) {
+  VisualizationButton(String _name; int _x, int _y, int _w, int _h) {
+    name = _name;
     x = _x;
     y = _y;
     w = _w;
@@ -17,17 +18,10 @@ class VisualizationButton {
     active = false;
   }
 
-  void changeColor() {
-//    if (active) {
-//      fill(200);
-//    } 
-//    else {
-      noFill();
-//    }
-  }
-
   void display() {
-    // LABEL?
+    fill(200);
+    text(name,x+w/2,y-h/2);
+    noFill();
     rectMode(CORNER);
     stroke(200);
     strokeWeight(0.5);

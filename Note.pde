@@ -67,7 +67,7 @@ class Note {
       for (int i = startIndex; i < startIndex + duration; i++) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
         yPoint = map(data.pitch[i], globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
-        if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
+        if ( xPoint <= rightBorder && xPoint >= leftBorder)  vertex(xPoint, yPoint);
       }
       endShape();
     }
@@ -86,13 +86,13 @@ class Note {
       for (int i = startIndex; i < startIndex + duration; i++) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
         yPoint = map(offset + data.rms[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
-        if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
+        if ( xPoint <= rightBorder && xPoint >= leftBorder)  vertex(xPoint, yPoint); 
       }
       // Back along the top
       for (int i = startIndex + duration - 1; i > startIndex-1; i--) {
         xPoint = map(i, startTime, endTime, leftBorder, rightBorder);
         yPoint = map(offset - data.rms[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
-        if ( xPoint <= rightBorder && xPoint >= leftBorder) { vertex(xPoint, yPoint); }
+        if ( xPoint <= rightBorder && xPoint >= leftBorder)  vertex(xPoint, yPoint); 
       }
       endShape(CLOSE);
     }
@@ -106,19 +106,19 @@ class Note {
       float xPoint1;
       float xPoint2;
       float yPoint1;
-      float yPoint2;      
-  
+      float yPoint2;
+      float yPoint3;  
 //      beginShape();
-      noStroke();
 
-      for (int i = startIndex + duration; i > startIndex-1; i--) {
+      for (int i = startIndex + duration - 1; i > startIndex-1; i--) {
         xPoint1 = map(i, startTime, endTime, leftBorder, rightBorder);
         xPoint2 = map(i+1, startTime, endTime, leftBorder, rightBorder);
         yPoint1 = map(offset + data.rmsSmoothed[i] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
         yPoint2 = map(offset, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
+        yPoint3 = map(offset + data.rmsSmoothed[i+1] * data.rmsScalar, globalMinPitch, globalMaxPitch, bottomBorder, topBorder);
 //        if ( xPoint2 <= rightBorder && xPoint1 >= leftBorder) vertex(xPoint1, yPoint1); 
         setAmpColor(data.rmsSmoothed[i]/data.maxRms);
-        if ( xPoint2 <= rightBorder && xPoint1 >= leftBorder) quad(xPoint1,yPoint2,xPoint1,yPoint1,xPoint2,yPoint1,xPoint2,yPoint2);
+        if ( xPoint2 <= rightBorder && xPoint1 >= leftBorder) quad(xPoint1,yPoint2,xPoint1,yPoint1,xPoint2,yPoint3,xPoint2,yPoint2);
       }
       stroke(data.noteColor);
       strokeWeight(2);

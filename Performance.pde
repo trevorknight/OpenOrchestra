@@ -1,4 +1,4 @@
-// Class for everything to do with one recording
+// Class for everything related to one recording
 
 class Performance {
   String name;
@@ -15,7 +15,8 @@ class Performance {
   Performance(String _name, String _audioFileName, color _noteColor) {
     name = _name;
     audioFileName = _audioFileName;
+    pathToAudioFile = dataPath(audioFileName);
     noteColor = _noteColor;
-    
+  }  
   
 }
