@@ -2,6 +2,7 @@
 
 class Note {
 
+
   // Variables
   int noteNumber;
   int startIndex;
@@ -135,7 +136,7 @@ class Note {
     float R = 255;
     float G;
     if (sca < 0.98) {
-      G = 255*pow((0.98-sca)/.98,1.0/2.0);
+      G = 255*pow((0.98-sca)/.98,1.0/1.5);
     } 
     else {
       R = 255;

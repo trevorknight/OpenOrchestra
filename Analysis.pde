@@ -89,7 +89,6 @@ void setup() {
   measureStartTimes = new int[163];
   measureStartIndices = new int[163];
   findMeasureStartIndices();
-  currentMeasure = 0;
   lastMeasure = 162;
   
 //  for (Performance p : performances) {
@@ -151,12 +150,17 @@ void setup() {
   playStudent = new PlayButton(60,height*0.125,35);
   justStartedReference = false;
   justStartedStudent = false;
+  
+  // START POINT
+  currentMeasure = 12;
+  setNewStartEnd();
 }
 
 void draw() {
   smooth();
   background(255);
   fill(200);
+  textAlign(LEFT);
   text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50);
   reference.showLegend(85,0.08*height);
   student.showLegend(85,0.13*height);

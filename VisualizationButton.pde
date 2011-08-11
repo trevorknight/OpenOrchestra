@@ -9,7 +9,7 @@ class VisualizationButton {
 
 
   //Constructor
-  VisualizationButton(String _name; int _x, int _y, int _w, int _h) {
+  VisualizationButton(String _name, int _x, int _y, int _w, int _h) {
     name = _name;
     x = _x;
     y = _y;
@@ -20,7 +20,8 @@ class VisualizationButton {
 
   void display() {
     fill(200);
-    text(name,x+w/2,y-h/2);
+    textAlign(CENTER);
+    text(name,x+w/2,y-5);
     noFill();
     rectMode(CORNER);
     stroke(200);
