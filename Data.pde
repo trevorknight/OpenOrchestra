@@ -1,8 +1,23 @@
-// Class for holding extracted data from recordings
+// Class for everything to do with a single performance
 
-class Data {
-  String name;
-  color noteColor;
+class Performance {
+
+  boolean active; //Whether it's shown/available for playback
+  String name; //What the saved data is called and what's shown on the screen
+  color noteColor; //The color of the screen stuff
+  
+  //Audio File
+  String audioFileName; // for example SA-XB-09-003.wav
+  String pathToAudioFile; //The full path of the audio to pass to VAMP 
+  
+  //For audio playback
+  AudioChannel audioChannel;
+  PlayButton playButton;
+  boolean justStarted; //boolean to determine if the audio file just started so the playStartTime can be set
+  int playStartTime; //holds the time in milliseconds that play started so that the playback head can be shown progressing across the screen
+  float playPosition;  // position of the playback head in screen pixels
+  
+  // Actual data
   float[] pitch;
   float minPitch;
   float maxPitch;
@@ -15,7 +30,7 @@ class Data {
   int[] onsets;
   Note[] notes;
 
-  Data(color _noteColor, float _pitchOffset, String _name) {
+  Performance(color _noteColor, float _pitchOffset, String _name) {
     name = _name;
     noteColor = _noteColor;
     pitch = new float[0];
@@ -87,7 +102,8 @@ class Data {
   }
 
   // Load data
-  void loadData(String file) {
+  void loadData() {
+    String file = name + ".dat";
     String[] lines = loadStrings(file);
     int tempL= lines.length;
     time = expand(time, tempL);
@@ -131,7 +147,7 @@ class Data {
     }
   }
   
-  // Creates an array of note objects for each data
+  // Creates an array of note objects for each performance
   void formNotes() {
     int d;
     int endIndex;
@@ -156,7 +172,6 @@ class Data {
         }
       }
       
-      //println(data.onsets[i] +" "+ d);
       Note tempNote = new Note(i, onsets[i], d, this);
       notes = (Note[])append(notes, tempNote);
     }

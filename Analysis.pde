@@ -6,16 +6,16 @@ import krister.Ess.*;
 // VAMP
 //JVamp jvamp = new JVamp(this);
 
-// DATA
-Performance[] performances;
+// PERFORMANCES AND DATA
+Performance[] performances = new Performance[2];
+float[] offsets = {3.0/7.0, 4.0/7.0, 5.0/7.0};
+color[] colors = {color(0,30,255,120), color(100,100,100,180), color(255,255,30,120)};
+String[] names = {"Reference", "You (1st Alto)", "2nd Alto"};
 
 String pathToRefAudioFile;
 String refAudioFileName;
 String pathToStuAudioFile;
 String stuAudioFileName;
-
-Data reference;
-Data student;
 
 float globalMinPitch;
 float globalMaxPitch;
@@ -59,7 +59,7 @@ float playbackDuration;
 // =============================================
 void setup() {
   size(1400,900);
-  font = loadFont("ArialUnicodeMS-20.vlw");
+  font = loadFont("HelveticaNeue-20.vlw");
   textFont(font, 20);
   
   
@@ -72,13 +72,15 @@ void setup() {
   stuAudioFileName = "SA-XB-03-002.wav";
   pathToStuAudioFile = dataPath(stuAudioFileName);
   
-  reference = new Data(color(0,30,255,120), 3.0/7.0, "Reference");
-  student = new Data(color(100,100,100,180), 4.0/7.0, "You (1st Alto)");
+  for (int i = 0; i < performances.length; i++) {
+    performances[i] = new Performance(colors[i], offsets[i], names[i]);
+  }
   
 // VAMP/LOAD
 //  try {
-    reference.loadData("reference.dat");
-    student.loadData("student.dat");
+    for (Performance p : performances) {
+      p.loadData();
+    }
 //  } catch (Exception e) {
 //    reference.runVamp(pathToRefAudioFile);
 //    reference.saveData("reference.dat");
@@ -91,33 +93,25 @@ void setup() {
   findMeasureStartIndices();
   lastMeasure = 162;
   
-//  for (Performance p : performances) {
-//    p.findMinMax();
-//    p.setRmsScalar();
-//    p.filterPitch();
-//    p.findOnsets();
-//    p.formNotes();
-//  }
+  globalMinPitch = 100;
+  globalMaxPitch = 5;
+  maxTime = 10000000;
+  for (Performance p : performances) {
+    p.findMinMax();
+    p.setRmsScalar();
+    p.filterPitch();
+    p.findOnsets();
+    globalMinPitch = min(p.minPitch, globalMinPitch);
+    globalMaxPitch = max(p.maxPitch, globalMaxPitch);  
+    maxTime = min(maxTime, p.time.length)-1;
+  }
   
-  reference.findMinMax();
-  student.findMinMax();
-  
-  globalMinPitch = min(student.minPitch, reference.minPitch);
-  globalMaxPitch = max(student.maxPitch, reference.maxPitch);  
+  for (Performance p : performances) {
+    p.formNotes();
+  }
 
-  reference.setRmsScalar();
-  student.setRmsScalar();
-  reference.filterPitch();
-  student.filterPitch();
-  reference.findOnsets();
-  student.findOnsets();
-  reference.formNotes();
-  student.formNotes();
-
-  
-  areasOfInterest = findAreasOfInterest(student, reference);
-  noteMatches = matchNotes(student, reference);
-  maxTime = min(student.time.length, reference.time.length)-1;
+//  areasOfInterest = findAreasOfInterest(performances[0], performances[1]);
+//  noteMatches = matchNotes(student, reference);
 
   
   // INTERFACE
@@ -162,23 +156,46 @@ void draw() {
   fill(200);
   textAlign(LEFT);
   text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50);
-  reference.showLegend(85,0.08*height);
-  student.showLegend(85,0.13*height);
+  for (int i = 0; i < performances.length; i++) {
+    performances[i].showLegend(85, 75+45*i);
+  }
 
   // MAIN VISUALIZATION
   int left = 0;
   int right = width;
   int top = 85;
   int bottom = height-85;
-  for(Note n : reference.notes) {
-    if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
-    if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
-    if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
+  for (Performance p : performances) {
+    for(Note n : p.notes) {
+      if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
+      if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
+      if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
+    }
   }
-  for(Note n : student.notes) {
-    if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
-    if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
-    if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
+//  for(Note n : student.notes) {
+//    if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
+//    if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
+//    if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
+//  }
+  
+  if (visualizationButtons[0].active) {
+    stroke(200);
+    strokeWeight(1);
+    for (float f : keySignature) {
+      float ksPoint = map(f,globalMinPitch,globalMaxPitch,bottom,top);
+      line(0,ksPoint,width,ksPoint);
+    }
+  }
+  
+  if (visualizationButtons[2].active) {
+    float yPoint;
+    strokeWeight(5);
+    noFill();
+    for (Performance p : performances) {
+      yPoint = map(p.pitchOffset, 0, 1, top, bottom)+2.5;
+      stroke(p.noteColor);
+      line(0,yPoint,width,yPoint);
+    }
   }
   
   // VISUALIZATION BUTTONS
@@ -188,25 +205,21 @@ void draw() {
   
   top = visualizationButtonCorners[3];
   bottom = visualizationButtonCorners[3]+visualizationButtonDimensions[1];
-  for(Note n : reference.notes) {
-    n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
-    n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
-    n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
-  }
-  for(Note n : student.notes) {
-    n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
-    n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
-    n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
-  }
-  
-  if (visualizationButtons[0].active) {
-    stroke(0);
-    strokeWeight(1);
-    for (float f : keySignature) {
-      float ksPoint = map(f,globalMinPitch,globalMaxPitch,height,0);
-      line(0,ksPoint,width,ksPoint);
+  for (Performance p : performances) {
+    for(Note n : p.notes) {
+      n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
+      n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
+      n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
     }
   }
+//  for(Note n : student.notes) {
+//    n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
+//    n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
+//    n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
+//  }
+  
+
+  
   
   //SCROLLING
   rightButton.display();
@@ -227,8 +240,8 @@ void draw() {
     }
     currentTime = millis();
     referencePlayPosition = lerp(0,width,float(currentTime-referenceStartTime)/playbackDuration);
-    strokeWeight(2);
-    stroke(reference.noteColor);
+    strokeWeight(1);
+    stroke(colors[0]);
     line(referencePlayPosition,0,referencePlayPosition,height);
     playReference.displayPlaying(mouseX,mouseY);
   }
@@ -244,8 +257,8 @@ void draw() {
     }
     currentTime = millis();
     studentPlayPosition = lerp(0,width,float(currentTime-studentStartTime)/playbackDuration);
-    strokeWeight(2);
-    stroke(student.noteColor);
+    strokeWeight(1);
+    stroke(colors[1]);
     line(studentPlayPosition,0,studentPlayPosition,height);
     playStudent.displayPlaying(mouseX,mouseY);
   }

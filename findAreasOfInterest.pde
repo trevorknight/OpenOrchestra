@@ -1,4 +1,4 @@
-int[] findAreasOfInterest(Data student, Data reference) {
+int[] findAreasOfInterest(Performance student, Performance reference) {
 
   //Break piece into ~3 second chunks (300 data points), sum up
   int cSize = 300; //Chunk size (how many points are grouped together)

@@ -1,8 +1,8 @@
 void findTimesSetInsOuts() {
   referenceChannel.stop();
   studentChannel.stop();  
-  startTimeMS = int(student.time[targetStartTime]);
-  endTimeMS = int(student.time[targetEndTime]);
+  startTimeMS = int(performances[0].time[targetStartTime]);
+  endTimeMS = int(performances[0].time[targetEndTime]);
   referenceChannel.in(referenceChannel.frames(startTimeMS));
   studentChannel.in(studentChannel.frames(startTimeMS));
   referenceChannel.out(referenceChannel.frames(endTimeMS));
