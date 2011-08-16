@@ -1,12 +1,13 @@
 void findTimesSetInsOuts() {
-  referenceChannel.stop();
-  studentChannel.stop();  
+  for (Performance p : performances) {
+    p.audioChannel.stop();
+  }
   startTimeMS = int(performances[0].time[targetStartTime]);
   endTimeMS = int(performances[0].time[targetEndTime]);
-  referenceChannel.in(referenceChannel.frames(startTimeMS));
-  studentChannel.in(studentChannel.frames(startTimeMS));
-  referenceChannel.out(referenceChannel.frames(endTimeMS));
-  studentChannel.out(studentChannel.frames(endTimeMS));
-  referenceChannel.cue(referenceChannel.frames(startTimeMS));
-  studentChannel.cue(studentChannel.frames(startTimeMS));
+  for (Performance p : performances) {
+    p.audioChannel.in(p.audioChannel.frames(startTimeMS));
+    p.audioChannel.out(p.audioChannel.frames(endTimeMS));
+    p.audioChannel.cue(p.audioChannel.frames(startTimeMS));
+  }
+
 }

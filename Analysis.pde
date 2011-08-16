@@ -1,26 +1,24 @@
 // DEPENDENCIES
-//import jVamp.*;
+import jVamp.*;
 PFont font;
 import krister.Ess.*;
 
 // VAMP
-//JVamp jvamp = new JVamp(this);
+JVamp jvamp = new JVamp(this);
 
-// PERFORMANCES AND DATA
+// PERFORMANCES
 Performance[] performances = new Performance[2];
 float[] offsets = {3.0/7.0, 4.0/7.0, 5.0/7.0};
 color[] colors = {color(0,30,255,120), color(100,100,100,180), color(255,255,30,120)};
 String[] names = {"Reference", "You (1st Alto)", "2nd Alto"};
-
-String pathToRefAudioFile;
-String refAudioFileName;
-String pathToStuAudioFile;
-String stuAudioFileName;
+String[] files = {"SA-MB-09-002.wav", "SA-XB-03-002.wav"};
 
 float globalMinPitch;
 float globalMaxPitch;
 int[] noteMatches;
 int[] areasOfInterest;
+
+// PIECE-SPECIFIC INFO
 int[] measureStartTimes;
 int[] measureStartIndices;
 int currentMeasure;
@@ -41,18 +39,8 @@ int[] visualizationButtonCorners = new int[4];
 int[] visualizationButtonDimensions = new int[2];
 
 // AUDIO
-AudioChannel referenceChannel;
-AudioChannel studentChannel;
-PlayButton playReference;
-PlayButton playStudent;
 int startTimeMS;
 int endTimeMS;
-boolean justStartedReference;
-int referenceStartTime;
-float referencePlayPosition;
-boolean justStartedStudent;
-int studentStartTime;
-float studentPlayPosition;
 int currentTime;
 float playbackDuration;
 
@@ -64,35 +52,27 @@ void setup() {
   
   
   // PERFORMANCES
-//  performances = new Performance[2];
-//  performances[0] = new Performance("Reference", "SA-MB-09-002.wav", color(0,30,255,120));
-//  performances[1] = new Performance("You (1st Alto)", "SA-XB-03-002.wav", color(100,100,100,180));
-  refAudioFileName = "SA-MB-09-002.wav";
-  pathToRefAudioFile = dataPath(refAudioFileName);
-  stuAudioFileName = "SA-XB-03-002.wav";
-  pathToStuAudioFile = dataPath(stuAudioFileName);
-  
   for (int i = 0; i < performances.length; i++) {
-    performances[i] = new Performance(colors[i], offsets[i], names[i]);
+    performances[i] = new Performance(files[i], colors[i], offsets[i], names[i]);
   }
   
 // VAMP/LOAD
-//  try {
-    for (Performance p : performances) {
-      p.loadData();
-    }
-//  } catch (Exception e) {
-//    reference.runVamp(pathToRefAudioFile);
-//    reference.saveData("reference.dat");
-//    student.runVamp(pathToStuAudioFile);
-//    student.saveData("student.dat");
-//  }
+ for (Performance p : performances) {
+   try { 
+     p.loadData();
+   } catch (Exception e) {
+    p.runVamp();
+    p.saveData();
+  }
+ }
   
   measureStartTimes = new int[163];
   measureStartIndices = new int[163];
   findMeasureStartIndices();
   lastMeasure = 162;
   
+  
+  // SETUP PERFORMANCE DATA
   globalMinPitch = 100;
   globalMaxPitch = 5;
   maxTime = 10000000;
@@ -106,7 +86,7 @@ void setup() {
     maxTime = min(maxTime, p.time.length)-1;
   }
   
-  for (Performance p : performances) {
+  for (Performance p : performances) { //Requires global max/min pitch so must be run afterwards
     p.formNotes();
   }
 
@@ -135,16 +115,16 @@ void setup() {
   
   // AUDIO
   Ess.start(this); // start up Ess
-  referenceChannel = new AudioChannel("SA-MB-09-002.wav"); 
-  studentChannel = new AudioChannel("SA-XB-03-002.wav"); 
-  referenceChannel.bufferSize(referenceChannel.frames(500));
-  studentChannel.bufferSize(studentChannel.frames(500));
+  for (Performance p : performances) {
+    p.audioChannel = new AudioChannel(p.audioFileName);
+    p.audioChannel.bufferSize(p.audioChannel.frames(300));
+  }
   findTimesSetInsOuts();
-  playReference = new PlayButton(60,height*0.075,35);
-  playStudent = new PlayButton(60,height*0.125,35);
-  justStartedReference = false;
-  justStartedStudent = false;
-  
+  for (int i = 0; i < performances.length; i++) {
+    performances[i].playButton = new PlayButton(60,75+45*i,35);
+    performances[i].justStarted = false;
+  }
+
   // START POINT
   currentMeasure = 12;
   setNewStartEnd();
@@ -172,11 +152,7 @@ void draw() {
       if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
     }
   }
-//  for(Note n : student.notes) {
-//    if (visualizationButtons[0].active) n.displayA(left, right, top, bottom);
-//    if (visualizationButtons[1].active) n.displayB(left, right, top, bottom);
-//    if (visualizationButtons[2].active) n.displayC(left, right, top, bottom);
-//  }
+
   
   if (visualizationButtons[0].active) {
     stroke(200);
@@ -212,14 +188,6 @@ void draw() {
       n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
     }
   }
-//  for(Note n : student.notes) {
-//    n.displayA(visualizationButtonCorners[0],visualizationButtonCorners[0]+visualizationButtonDimensions[0],top,bottom);
-//    n.displayB(visualizationButtonCorners[1],visualizationButtonCorners[1]+visualizationButtonDimensions[0],top,bottom); 
-//    n.displayC(visualizationButtonCorners[2],visualizationButtonCorners[2]+visualizationButtonDimensions[0],top,bottom);
-//  }
-  
-
-  
   
   //SCROLLING
   rightButton.display();
@@ -229,38 +197,23 @@ void draw() {
   
   // AUDIO
   
-  if (referenceChannel.state==Ess.STOPPED) {
-    playReference.displayStopped(mouseX,mouseY);
-    if (justStartedReference) justStartedReference = false;
-  }
-  else {
-    if (!justStartedReference) {
-      justStartedReference = true;
-      referenceStartTime = millis();
+  for (Performance p : performances) {
+    if (p.audioChannel.state == Ess.STOPPED) {
+      p.playButton.displayStopped(mouseX,mouseY);
+      if (p.justStarted) p.justStarted = false;
     }
-    currentTime = millis();
-    referencePlayPosition = lerp(0,width,float(currentTime-referenceStartTime)/playbackDuration);
-    strokeWeight(1);
-    stroke(colors[0]);
-    line(referencePlayPosition,0,referencePlayPosition,height);
-    playReference.displayPlaying(mouseX,mouseY);
-  }
-
-  if (studentChannel.state==Ess.STOPPED) {
-    playStudent.displayStopped(mouseX,mouseY);
-    if (justStartedStudent) justStartedStudent = false;
-  }
-  else {
-    if (!justStartedStudent) {
-      justStartedStudent = true;
-      studentStartTime = millis();
+    else {
+      if (!p.justStarted) {
+        p.justStarted = true;
+        p.playStartTime = millis();
+      }
+      currentTime = millis();
+      p.playPosition = lerp(0,width,float(currentTime-p.playStartTime)/playbackDuration);
+      strokeWeight(1);
+      stroke(p.noteColor);
+      line(p.playPosition,0,p.playPosition,height);
+      p.playButton.displayPlaying(mouseX,mouseY);
     }
-    currentTime = millis();
-    studentPlayPosition = lerp(0,width,float(currentTime-studentStartTime)/playbackDuration);
-    strokeWeight(1);
-    stroke(colors[1]);
-    line(studentPlayPosition,0,studentPlayPosition,height);
-    playStudent.displayPlaying(mouseX,mouseY);
   }
 }
 
@@ -296,29 +249,21 @@ void mousePressed() {
     }
   }
   
-  if (playStudent.contains(mouseX,mouseY)) {
-    if (studentChannel.state==Ess.STOPPED) {
-      studentChannel.play(1);
-    }
-    else {
-      studentChannel.stop();
-      studentChannel.cue(studentChannel.frames(startTimeMS));
-    }
-  }
-  
-  if (playReference.contains(mouseX,mouseY)) {
-    if (referenceChannel.state==Ess.STOPPED) {
-      referenceChannel.play(1);
-    }
-    else {
-      referenceChannel.stop();
-      referenceChannel.cue(referenceChannel.frames(startTimeMS));
+  for (Performance p : performances) {
+    if (p.playButton.contains(mouseX,mouseY)) {
+      if (p.audioChannel.state==Ess.STOPPED) {
+        p.audioChannel.play(1);
+      }
+      else {
+        p.audioChannel.stop();
+        p.audioChannel.cue(p.audioChannel.frames(startTimeMS));
+      }
     }
   }
 }
 
 void audioChannelDone(AudioChannel ch) {
-  ch.cue(referenceChannel.frames(startTimeMS));
+  ch.cue(performances[0].audioChannel.frames(startTimeMS));
 }
 
 public void stop() {
