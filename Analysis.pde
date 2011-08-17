@@ -7,11 +7,14 @@ import krister.Ess.*;
 JVamp jvamp = new JVamp(this);
 
 // PERFORMANCES
-Performance[] performances = new Performance[2];
-float[] offsets = {3.0/7.0, 4.0/7.0, 5.0/7.0};
-color[] colors = {color(0,30,255,120), color(100,100,100,180), color(255,255,30,120)};
-String[] names = {"Reference", "You (1st Alto)", "2nd Alto"};
-String[] files = {"SA-MB-09-002.wav", "SA-XB-03-002.wav"};
+Performance[] performances = new Performance[3];
+//  if (performances.length == 3) offsets = {3.0/7.0, 4.0/7.0};
+//  if (performances.length == 3) offsets = {2.5/7.0, 3.5/7.0, 4.5/7.0};
+//  if (performances.length == 4) offsets = {2.0/7.0, 3.0/7.0, 4.0/7.0, 5.0/7.0};
+float[] offsets = {2.5/7.0, 3.5/7.0, 4.5/7.0};
+color[] colors = {color(0,30,255,120), color(100,100,100,180), color(255,30,0,140), color(0,255,30,120)};
+String[] names = {"Reference", "You (1st Alto)", "You (1st Alto, 2nd take)"};
+String[] files = {"SA-MB-09-002.wav", "SA-XB-03-002.wav", "SA-XB-03-001.wav"};
 
 float globalMinPitch;
 float globalMaxPitch;
@@ -52,6 +55,7 @@ void setup() {
   
   
   // PERFORMANCES
+
   for (int i = 0; i < performances.length; i++) {
     performances[i] = new Performance(files[i], colors[i], offsets[i], names[i]);
   }
@@ -61,8 +65,8 @@ void setup() {
    try { 
      p.loadData();
    } catch (Exception e) {
-    p.runVamp();
-    p.saveData();
+     p.runVamp();
+     p.saveData();
   }
  }
   
@@ -137,7 +141,7 @@ void draw() {
   textAlign(LEFT);
   text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50);
   for (int i = 0; i < performances.length; i++) {
-    performances[i].showLegend(85, 75+45*i);
+    performances[i].showLegend(85, 82+45*i);
   }
 
   // MAIN VISUALIZATION

@@ -94,7 +94,7 @@ class Performance {
 
   // Save data for faster running in the future
   void saveData() {
-    String file = name + ".dat";
+    String filename = name + ".dat";
     String[] temp = new String[time.length];
 
     for(int i=0; i < time.length; i++) {
