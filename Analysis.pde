@@ -7,7 +7,7 @@ import krister.Ess.*;
 JVamp jvamp = new JVamp(this);
 
 // PERFORMANCES
-Performance[] performances = new Performance[3];
+Performance[] performances = new Performance[2];
 //  if (performances.length == 3) offsets = {3.0/7.0, 4.0/7.0};
 //  if (performances.length == 3) offsets = {2.5/7.0, 3.5/7.0, 4.5/7.0};
 //  if (performances.length == 4) offsets = {2.0/7.0, 3.0/7.0, 4.0/7.0, 5.0/7.0};
@@ -19,7 +19,7 @@ String[] files = {"SA-MB-09-002.wav", "SA-XB-03-002.wav", "SA-XB-03-001.wav"};
 float globalMinPitch;
 float globalMaxPitch;
 int[] noteMatches;
-int[] areasOfInterest;
+int[] measuresOfInterest;
 
 // PIECE-SPECIFIC INFO
 int[] measureStartTimes;
@@ -93,8 +93,10 @@ void setup() {
   for (Performance p : performances) { //Requires global max/min pitch so must be run afterwards
     p.formNotes();
   }
-
-//  areasOfInterest = findAreasOfInterest(performances[0], performances[1]);
+  println("measures: " + measureStartIndices);
+  measuresOfInterest = findMeasuresOfInterest(performances[0], performances[1]);
+  println("measures: " + measureStartIndices);
+  println(measuresOfInterest);
 //  noteMatches = matchNotes(student, reference);
 
   
@@ -137,6 +139,7 @@ void setup() {
 void draw() {
   smooth();
   background(255);
+  drawHighlightingSquare();
   fill(200);
   textAlign(LEFT);
   text("Basie-Straight Ahead :: Measure " + (currentMeasure+1) + " of " + (lastMeasure+1), width-400, 50);
@@ -221,18 +224,14 @@ void draw() {
   }
 }
 
-
 // KEY AND BUTTON PRESSES
 void keyPressed() {
   if (keyCode >= 48 && keyCode <= 57) {
-    targetStartTime = areasOfInterest[keyCode-48];
-    targetEndTime = targetStartTime + 300;
+    println(keyCode);
+    println(measuresOfInterest[keyCode-48]);
+    currentMeasure = measuresOfInterest[keyCode-48];
+    setNewStartEnd();
   }
-  if (key == 'h') {
-    targetStartTime = 0;
-    targetEndTime = maxTime;
-  }
-  findTimesSetInsOuts();
 }
 
 void mousePressed() {
