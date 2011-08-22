@@ -1,3 +1,6 @@
+// Just for moving the view smoothly. 
+// The startTime/endTime is the actual drawing window and the targets are 
+// where it wants to end up, so it gets there 10% at a time.
 void moveView() {
   if ( (startTime != targetStartTime) || (endTime != targetEndTime) ) {
     

@@ -11,7 +11,7 @@ Performance[] performances = new Performance[2];
 //  if (performances.length == 3) offsets = {3.0/7.0, 4.0/7.0};
 //  if (performances.length == 3) offsets = {2.5/7.0, 3.5/7.0, 4.5/7.0};
 //  if (performances.length == 4) offsets = {2.0/7.0, 3.0/7.0, 4.0/7.0, 5.0/7.0};
-float[] offsets = {2.5/7.0, 3.5/7.0, 4.5/7.0};
+float[] offsets = {3.0/7.0, 4.0/7.0};
 color[] colors = {color(0,30,255,120), color(100,100,100,180), color(255,30,0,140), color(0,255,30,120)};
 String[] names = {"Reference", "You (1st Alto)", "You (1st Alto, 2nd take)"};
 String[] files = {"SA-MB-09-002.wav", "SA-XB-03-002.wav", "SA-XB-03-001.wav"};

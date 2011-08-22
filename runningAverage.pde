@@ -1,4 +1,6 @@
 // Calculate the (2n+1)-point running average of an array
+// (Used for the dynamics visualization)
+
 float[] runningAverage(float[] data, int n) {
 
   float[] b = new float[data.length];

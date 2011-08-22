@@ -1,3 +1,5 @@
+// This is for converting time-based measure break points into ones based on indices of the data
+
 void findMeasureStartIndices() {
   int currentIndex = 0;
   for (int i = 0; i < 163; i++) {

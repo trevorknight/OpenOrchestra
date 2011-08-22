@@ -1,6 +1,8 @@
+//This code compares two sets of data and finds measures of most difference.
+
 int[] findMeasuresOfInterest(Performance student, Performance reference) {
   
-  int numberOfMOIs = 5;
+  int numberOfMOIs = 5; // The number of measures for each category (time and pitch) is set here.
   int[] timeMOIs = new int[numberOfMOIs];
   int[] pitchMOIs = new int[numberOfMOIs];
   float[] timeMOIValues =  new float[numberOfMOIs];
