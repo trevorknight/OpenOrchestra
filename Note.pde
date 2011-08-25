@@ -143,6 +143,5 @@ class Note {
     noStroke();
     fill(R,G,0,255);
   }
-  
-}
 
+}

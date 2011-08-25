@@ -22,14 +22,14 @@ class VisualizationButton {
     fill(200);
     textAlign(CENTER);
     text(name,x+w/2,y-5);
-    noFill();
+    fill(255);
     rectMode(CORNER);
     stroke(200);
     strokeWeight(0.5);
     rect(x,y,w,h);
     if (active) {
-      strokeWeight(3);
-      line(x,y+h+5,x+w,y+h+5);
+      strokeWeight(4);
+      line(x,y+h+5,x+w,y+h+6);
     }
   }
 
